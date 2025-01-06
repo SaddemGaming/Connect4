@@ -16,6 +16,15 @@ sudo apt install -y build-essential cmake qt6-base-dev git
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 cd "$SCRIPT_DIR"
 
+# Clone googletest
+EXTERNEL_DIR="external"
+cd "$EXTERNEL_DIR"
+if [ ! -d "gtest" ]; then
+    echo "Cloning googletest..."
+    git clone git@github.com:google/googletest.git gtest
+fi
+cd "$SCRIPT_DIR"
+
 # Create and navigate to the build directory
 BUILD_DIR="build"
 if [ ! -d "$BUILD_DIR" ]; then
