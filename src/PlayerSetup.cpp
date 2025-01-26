@@ -18,15 +18,18 @@ PlayerSetup::~PlayerSetup() {
 }
 
 void PlayerSetup::onConfirm() {
-    Player *player1 = new HumanPlayer("Player 1", "X");
-    Player *player2 = (ui->gameModeComboBox->currentIndex() == 1)
-                      ? static_cast<Player *>(new HumanPlayer("Player 2", "O"))
-                      : static_cast<Player *>(new ComputerPlayer("Computer", "O"));
+    std::unique_ptr<Player> player1 = std::make_unique<HumanPlayer>("Player 1", "X");
+    std::unique_ptr<Player> player2;
 
-    GameScreen *gameScreen = new GameScreen(player1, player2, ui->gameModeComboBox->currentIndex() == 0);
+    if (ui->gameModeComboBox->currentIndex() == 1) {
+        player2 = std::make_unique<HumanPlayer>("Player 2", "O");
+    } else {
+        player2 = std::make_unique<ComputerPlayer>("Computer", "O");
+    }
+
+    GameScreen *gameScreen = new GameScreen(std::move(player1), std::move(player2), ui->gameModeComboBox->currentIndex() == 0);
 
     gameScreen->show();
 
-    // Emit accepted signal to notify MainWindow to close
-    accept();
+    accept(); // Notify MainWindow to close
 }

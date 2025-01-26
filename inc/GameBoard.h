@@ -3,8 +3,14 @@
 
 #include <vector>
 #include <string>
-#include <iostream>
 #include <algorithm>
+#include <memory>
+
+#include "WinConditionStrategy.h"
+
+constexpr int DEFAULT_ROWS = 6;
+constexpr int DEFAULT_COLUMNS = 7;
+constexpr char EMPTY_CELL[] = "-";
 
 /**
  * @brief Represents the Connect 4 game board.
@@ -38,11 +44,6 @@ public:
     bool isBoardFull() const;
 
     /**
-     * @brief Prints the game board to the console.
-     */
-    void printBoard() const;
-
-    /**
      * @brief Gets the current board grid.
      * @return The grid of the board.
      */
@@ -52,12 +53,12 @@ private:
     int m_rows;
     int m_columns;
     std::vector<std::vector<std::string>> m_grid;
+    int m_lastRow;
+    int m_lastColumn;
+    std::vector<std::unique_ptr<WinConditionStrategy>> winStrategies;
 
     bool isValidMove(int column) const;
     int findEmptyRow(int column) const;
-    bool checkHorizontalWin(const std::string& marker) const;
-    bool checkVerticalWin(const std::string& marker) const;
-    bool checkDiagonalWin(const std::string& marker) const;
 };
 
 #endif // GAMEBOARD_H

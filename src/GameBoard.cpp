@@ -1,32 +1,45 @@
 // GameBoard.cpp
+#include <stdexcept>
 #include "GameBoard.h"
+#include "HorizontalWinStrategy.h"
+#include "VerticalWinStrategy.h"
+#include "DiagonalWinStrategy.h"
 
-GameBoard::GameBoard() : m_rows(6), m_columns(7), m_grid(m_rows, std::vector<std::string>(m_columns, "-")) {}
+GameBoard::GameBoard()
+    : m_rows(DEFAULT_ROWS), m_columns(DEFAULT_COLUMNS),
+      m_grid(m_rows, std::vector<std::string>(m_columns, EMPTY_CELL)),
+      m_lastRow(-1),
+      m_lastColumn(-1) {
+    // Initialize win condition strategies
+    winStrategies.push_back(std::make_unique<HorizontalWinStrategy>());
+    winStrategies.push_back(std::make_unique<VerticalWinStrategy>());
+    winStrategies.push_back(std::make_unique<DiagonalWinStrategy>());
+}
+
 
 bool GameBoard::makeMove(int column, const std::string& marker) {
     if (isValidMove(column)) {
         int row = findEmptyRow(column);
         m_grid[row][column] = marker;
+        m_lastRow = row;
+        m_lastColumn = column;
         return true;
     }
     return false;
 }
 
 bool GameBoard::checkForWin(const std::string& marker) const {
-    return checkHorizontalWin(marker) || checkVerticalWin(marker) || checkDiagonalWin(marker);
+    for (const auto& strategy : winStrategies) {
+        if (strategy->check(m_grid, m_lastRow, m_lastColumn, marker)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool GameBoard::isBoardFull() const {
-    return std::all_of(m_grid[0].begin(), m_grid[0].end(), [](const std::string& cell) { return cell != "-"; });
-}
-
-void GameBoard::printBoard() const {
-    for (const auto& row : m_grid) {
-        for (const auto& cell : row) {
-            std::cout << cell << " ";
-        }
-        std::cout << "\n";
-    }
+    return std::all_of(m_grid[0].begin(), m_grid[0].end(),
+                       [](const std::string& cell) { return cell != EMPTY_CELL; });
 }
 
 bool GameBoard::isValidMove(int column) const {
@@ -40,46 +53,4 @@ int GameBoard::findEmptyRow(int column) const {
         }
     }
     throw std::runtime_error("Column is full.");
-}
-
-bool GameBoard::checkHorizontalWin(const std::string& marker) const {
-    for (const auto& row : m_grid) {
-        for (size_t col = 0; col <= m_columns - 4; ++col) {
-            if (row[col] == marker && row[col + 1] == marker &&
-                row[col + 2] == marker && row[col + 3] == marker) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool GameBoard::checkVerticalWin(const std::string& marker) const {
-    for (size_t col = 0; col < m_columns; ++col) {
-        for (size_t row = 0; row <= m_rows - 4; ++row) {
-            if (m_grid[row][col] == marker && m_grid[row + 1][col] == marker &&
-                m_grid[row + 2][col] == marker && m_grid[row + 3][col] == marker) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool GameBoard::checkDiagonalWin(const std::string& marker) const {
-    for (size_t row = 0; row <= m_rows - 4; ++row) {
-        for (size_t col = 0; col <= m_columns - 4; ++col) {
-            if (m_grid[row][col] == marker && m_grid[row + 1][col + 1] == marker &&
-                m_grid[row + 2][col + 2] == marker && m_grid[row + 3][col + 3] == marker) {
-                return true;
-            }
-        }
-        for (size_t col = 3; col < m_columns; ++col) {
-            if (m_grid[row][col] == marker && m_grid[row + 1][col - 1] == marker &&
-                m_grid[row + 2][col - 2] == marker && m_grid[row + 3][col - 3] == marker) {
-                return true;
-            }
-        }
-    }
-    return false;
 }

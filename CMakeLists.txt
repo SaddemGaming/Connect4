@@ -23,6 +23,9 @@ set(SOURCES
     src/GameBoard.cpp
     src/HumanPlayer.cpp
     src/ComputerPlayer.cpp
+    src/HorizontalWinStrategy.cpp
+    src/VerticalWinStrategy.cpp
+    src/DiagonalWinStrategy.cpp
 )
 
 set(HEADERS
@@ -34,6 +37,10 @@ set(HEADERS
     inc/Player.h
     inc/HumanPlayer.h
     inc/ComputerPlayer.h
+    inc/WinConditionStrategy.h
+    inc/HorizontalWinStrategy.h
+    inc/VerticalWinStrategy.h
+    inc/DiagonalWinStrategy.h
 )
 
 # UI files
@@ -79,8 +86,10 @@ add_executable(GameLogicTests
     src/GameBoard.cpp   # Include GameBoard implementation
     src/HumanPlayer.cpp # Include HumanPlayer implementation
     src/ComputerPlayer.cpp # Include ComputerPlayer implementation
+    src/HorizontalWinStrategy.cpp
+    src/VerticalWinStrategy.cpp
+    src/DiagonalWinStrategy.cpp
 )
-
 
 # Include directories for tests
 target_include_directories(GameLogicTests PRIVATE

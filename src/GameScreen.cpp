@@ -3,13 +3,13 @@
 #include "EndGame.h"
 #include "PlayerSetup.h"
 
-GameScreen::GameScreen(Player *p1, Player *p2, bool isPvC, QWidget *parent)
+GameScreen::GameScreen(std::unique_ptr<Player> p1, std::unique_ptr<Player> p2, bool isPvC, QWidget *parent)
     : QMainWindow(parent),
-      ui(new Ui::GameScreen),
-      player1(p1),
-      player2(p2),
+      ui(std::make_unique<Ui::GameScreen>()),
+      player1(std::move(p1)),
+      player2(std::move(p2)),
       PvC(isPvC),
-      currentPlayer(p1) {
+      currentPlayer(player1.get()) {
     ui->setupUi(this);
 
     connect(ui->makeMoveButton, &QPushButton::clicked, this, &GameScreen::onMakeMoveButtonClicked);
@@ -18,11 +18,7 @@ GameScreen::GameScreen(Player *p1, Player *p2, bool isPvC, QWidget *parent)
     ui->statusLabel->setText(QString("%1's Turn").arg(QString::fromStdString(currentPlayer->getName())));
 }
 
-GameScreen::~GameScreen() {
-    delete player1;
-    delete player2;
-    delete ui;
-}
+GameScreen::~GameScreen() = default;
 
 void GameScreen::updateBoard() {
     const auto &grid = gameBoard.getGrid();
@@ -63,39 +59,39 @@ void GameScreen::onMakeMoveButtonClicked() {
 
 void GameScreen::checkGameOver() {
     if (gameBoard.checkForWin(currentPlayer->getMarker())) {
-        EndGame *endGame = new EndGame(QString("%1 Wins!").arg(QString::fromStdString(currentPlayer->getName())), this);
+        auto endGame = std::make_unique<EndGame>(
+            QString("%1 Wins!").arg(QString::fromStdString(currentPlayer->getName())), this);
 
-        // Handle signals from EndGame dialog
-        connect(endGame, &EndGame::replayRequested, this, [this]() {
-            this->close(); // Close the GameScreen
-            PlayerSetup *setup = new PlayerSetup(); // Restart setup
+        connect(endGame.get(), &EndGame::replayRequested, this, [this]() {
+            this->close();
+            auto setup = std::make_unique<PlayerSetup>();
             setup->show();
+            setup.release();
         });
 
-        connect(endGame, &EndGame::quitRequested, this, [this]() {
-            qApp->quit(); // Quit the application
+        connect(endGame.get(), &EndGame::quitRequested, this, []() {
+            qApp->quit();
         });
 
-        endGame->exec(); // Show EndGame dialog
+        endGame->exec();
     } else if (gameBoard.isBoardFull()) {
-        EndGame *endGame = new EndGame("It's a Draw!", this);
+        auto endGame = std::make_unique<EndGame>("It's a Draw!", this);
 
-        // Handle signals from EndGame dialog
-        connect(endGame, &EndGame::replayRequested, this, [this]() {
-            this->close(); // Close the GameScreen
-            PlayerSetup *setup = new PlayerSetup(); // Restart setup
+        connect(endGame.get(), &EndGame::replayRequested, this, [this]() {
+            this->close();
+            auto setup = std::make_unique<PlayerSetup>();
             setup->show();
+            setup.release();
         });
 
-        connect(endGame, &EndGame::quitRequested, this, [this]() {
-            qApp->quit(); // Quit the application
+        connect(endGame.get(), &EndGame::quitRequested, this, []() {
+            qApp->quit();
         });
 
-        endGame->exec(); // Show EndGame dialog
+        endGame->exec();
     }
 }
 
-
 void GameScreen::switchTurn() {
-    currentPlayer = (currentPlayer == player1) ? player2 : player1;
+    currentPlayer = (currentPlayer == player1.get()) ? player2.get() : player1.get();
 }

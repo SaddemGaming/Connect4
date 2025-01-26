@@ -14,8 +14,5 @@ std::string HumanPlayer::getMarker() const {
 }
 
 int HumanPlayer::getMove(const std::vector<std::vector<std::string>>& board) const {
-    int column;
-    std::cout << m_name << " (" << m_marker << "), enter your move (0-6): ";
-    std::cin >> column;
-    return column;
+    throw std::runtime_error("HumanPlayer::getMove should not be called directly in a GUI-based application.");
 }

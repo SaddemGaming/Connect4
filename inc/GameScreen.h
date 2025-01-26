@@ -2,26 +2,30 @@
 #define GAMESCREEN_H
 
 #include <QMainWindow>
+#include <memory>
 #include "GameBoard.h"
 #include "Player.h"
 
 namespace Ui {
-class GameScreen;
+    class GameScreen; // Forward declaration
 }
 
 class GameScreen : public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit GameScreen(Player *player1, Player *player2, bool isPvC, QWidget *parent = nullptr);
+    explicit GameScreen(std::unique_ptr<Player> player1,
+                        std::unique_ptr<Player> player2,
+                        bool isPvC,
+                        QWidget* parent = nullptr);
     ~GameScreen();
 
 private:
-    Ui::GameScreen *ui;
+    std::unique_ptr<Ui::GameScreen> ui;
     GameBoard gameBoard;
-    Player *player1;
-    Player *player2;
-    Player *currentPlayer;
+    std::unique_ptr<Player> player1;
+    std::unique_ptr<Player> player2;
+    Player* currentPlayer;
     bool PvC;
 
     void updateBoard();
