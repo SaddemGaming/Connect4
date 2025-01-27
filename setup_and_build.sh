@@ -4,26 +4,48 @@ set -e  # Exit immediately if a command exits with a non-zero status
 
 echo "=== Connect4 Project Setup and Build Script ==="
 
-# Update package manager
-echo "Updating package lists..."
-sudo apt update
+# Function to check if a package is installed
+is_installed() {
+    dpkg -l | grep -qw "$1"
+}
 
-# Install dependencies
-echo "Installing required packages..."
-sudo apt install -y build-essential cmake qt6-base-dev git
+# Update package manager only if necessary
+if ! is_installed "build-essential" || ! is_installed "cmake" || ! is_installed "qt6-base-dev" || ! is_installed "git"; then
+    echo "Updating package lists..."
+    sudo apt update
+else
+    echo "All required packages are already installed."
+fi
+
+# Install dependencies if not already installed
+echo "Checking for required packages..."
+for package in build-essential cmake qt6-base-dev git; do
+    if ! is_installed "$package"; then
+        echo "Installing $package..."
+        sudo apt install -y "$package"
+    else
+        echo "$package is already installed."
+    fi
+done
 
 # Navigate to the script's directory (Connect4 root)
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 cd "$SCRIPT_DIR"
 
-# Clone googletest
+# Clone googletest if not already cloned
 EXTERNEL_DIR="external"
-cd "$EXTERNEL_DIR"
-if [ ! -d "gtest" ]; then
+GTEST_DIR="$EXTERNEL_DIR/gtest"
+
+if [ ! -d "$GTEST_DIR" ] || [ -z "$(ls -A "$GTEST_DIR")" ]; then
     echo "Cloning googletest..."
-    git clone git@github.com:google/googletest.git gtest
+    mkdir -p "$EXTERNEL_DIR"
+    cd "$EXTERNEL_DIR"
+    rm -rf gtest
+    git clone https://github.com/google/googletest.git gtest
+    cd "$SCRIPT_DIR"
+else
+    echo "googletest is already cloned and not empty."
 fi
-cd "$SCRIPT_DIR"
 
 # Create and navigate to the build directory
 BUILD_DIR="build"
