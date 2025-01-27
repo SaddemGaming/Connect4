@@ -72,24 +72,19 @@ void GameScreen::onMakeMoveButtonClicked() {
 }
 
 void GameScreen::checkGameOver() {
+    QString message;
+    bool gameOver = false;
+
     if (gameBoard.checkForWin(currentPlayer->getMarker())) {
-        auto endGame = std::make_unique<EndGame>(
-            QString("%1 Wins!").arg(QString::fromStdString(currentPlayer->getName())), this);
-
-        connect(endGame.get(), &EndGame::replayRequested, this, [this]() {
-            this->close();
-            auto setup = std::make_unique<PlayerSetup>();
-            setup->show();
-            setup.release();
-        });
-
-        connect(endGame.get(), &EndGame::quitRequested, this, []() {
-            qApp->quit();
-        });
-
-        endGame->exec();
+        message = QString("%1 Wins!").arg(QString::fromStdString(currentPlayer->getName()));
+        gameOver = true;
     } else if (gameBoard.isBoardFull()) {
-        auto endGame = std::make_unique<EndGame>("It's a Draw!", this);
+        message = "It's a Draw!";
+        gameOver = true;
+    }
+
+    if (gameOver) {
+        auto endGame = std::make_unique<EndGame>(message, this);
 
         connect(endGame.get(), &EndGame::replayRequested, this, [this]() {
             this->close();
