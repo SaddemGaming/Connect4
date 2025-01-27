@@ -19,7 +19,7 @@ signals:
     void quitRequested();   // Signal emitted for quit
 
 private:
-    Ui::EndGame *ui;
+    std::unique_ptr<Ui::EndGame> ui;
 };
 
 #endif // ENDGAME_H

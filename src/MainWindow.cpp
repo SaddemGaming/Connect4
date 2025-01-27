@@ -4,16 +4,14 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow) {
+    ui(std::make_unique<Ui::MainWindow>()) {
     ui->setupUi(this);
 
     // Connect the "Start Game" button
     connect(ui->startGameButton, &QPushButton::clicked, this, &MainWindow::onStartGame);
 }
 
-MainWindow::~MainWindow() {
-    delete ui;
-}
+MainWindow::~MainWindow() = default;
 
 void MainWindow::onStartGame() {
     PlayerSetup *playerSetupDialog = new PlayerSetup(this);

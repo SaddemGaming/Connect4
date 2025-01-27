@@ -2,7 +2,7 @@
 #include "ui_EndGame.h"
 
 EndGame::EndGame(const QString &message, QWidget *parent)
-    : QDialog(parent), ui(new Ui::EndGame) {
+    : QDialog(parent), ui(std::make_unique<Ui::EndGame>()) {
     ui->setupUi(this);
 
     // Set the result message
@@ -20,6 +20,4 @@ EndGame::EndGame(const QString &message, QWidget *parent)
     });
 }
 
-EndGame::~EndGame() {
-    delete ui;
-}
+EndGame::~EndGame() = default;

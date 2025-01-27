@@ -18,7 +18,7 @@ private slots:
     void onConfirm();
 
 private:
-    Ui::PlayerSetup *ui;
+    std::unique_ptr<Ui::PlayerSetup> ui;
 };
 
 #endif // PLAYERSETUP_H

@@ -6,16 +6,14 @@
 
 PlayerSetup::PlayerSetup(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::PlayerSetup) {
+    ui(std::make_unique<Ui::PlayerSetup>()) {
     ui->setupUi(this);
 
     // Connect the "Confirm" button
     connect(ui->confirmButton, &QPushButton::clicked, this, &PlayerSetup::onConfirm);
 }
 
-PlayerSetup::~PlayerSetup() {
-    delete ui;
-}
+PlayerSetup::~PlayerSetup() = default;
 
 void PlayerSetup::onConfirm() {
     std::unique_ptr<Player> player1 = std::make_unique<HumanPlayer>("Player 1", "X");
@@ -27,9 +25,9 @@ void PlayerSetup::onConfirm() {
         player2 = std::make_unique<ComputerPlayer>("Computer", "O");
     }
 
-    GameScreen *gameScreen = new GameScreen(std::move(player1), std::move(player2), ui->gameModeComboBox->currentIndex() == 0);
-
+    auto gameScreen = std::make_unique<GameScreen>(std::move(player1), std::move(player2), ui->gameModeComboBox->currentIndex() == 0);
     gameScreen->show();
-
+    gameScreen.release();
+    
     accept(); // Notify MainWindow to close
 }
