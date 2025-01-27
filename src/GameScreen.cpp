@@ -14,13 +14,13 @@ GameScreen::GameScreen(std::unique_ptr<Player> p1, std::unique_ptr<Player> p2, b
 
     connect(ui->makeMoveButton, &QPushButton::clicked, this, &GameScreen::onMakeMoveButtonClicked);
 
-    updateBoard();
+    drawBoard();
     ui->statusLabel->setText(QString("%1's Turn").arg(QString::fromStdString(currentPlayer->getName())));
 }
 
 GameScreen::~GameScreen() = default;
 
-void GameScreen::updateBoard() {
+void GameScreen::drawBoard() {
     const auto &grid = gameBoard.getGrid();
     for (int row = 0; row < 6; ++row) {
         for (int col = 0; col < 7; ++col) {
@@ -32,11 +32,25 @@ void GameScreen::updateBoard() {
     }
 }
 
+void GameScreen::updateBoard() {
+    int lastRow = gameBoard.getLastRow();
+    int lastCol = gameBoard.getLastColumn();
+
+    const auto& grid = gameBoard.getGrid();
+    QString marker = QString::fromStdString(grid[lastRow][lastCol]);
+
+    QLabel* label = qobject_cast<QLabel*>(ui->gridLayout->itemAtPosition(lastRow, lastCol)->widget());
+    if (label) {
+        label->setText(marker);
+    }
+}
+
+
 void GameScreen::onMakeMoveButtonClicked() {
     bool ok;
     int column = ui->ColumnInput->text().toInt(&ok) - 1;
 
-    if (!ok || column < 0 || column >= 7 || !gameBoard.makeMove(column, currentPlayer->getMarker())) {
+    if (!gameBoard.makeMove(column, currentPlayer->getMarker())) {
         ui->statusLabel->setText("Invalid move. Try again.");
         return;
     }

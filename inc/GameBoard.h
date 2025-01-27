@@ -49,6 +49,18 @@ public:
      */
     const std::vector<std::vector<std::string>>& getGrid() const { return m_grid; }
 
+    /**
+     * @brief Gets the last played row.
+     * @return Integer representing last row.
+     */
+    const int getLastRow() const { return m_lastRow; }
+
+    /**
+     * @brief Gets the last played column.
+     * @return Integer representing last row.
+     */
+    const int getLastColumn() const { return m_lastColumn; }
+
 private:
     int m_rows;
     int m_columns;

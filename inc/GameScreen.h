@@ -31,6 +31,7 @@ private:
     void updateBoard();
     void checkGameOver();
     void switchTurn();
+    void drawBoard();
 
 private slots:
     void onMakeMoveButtonClicked();
